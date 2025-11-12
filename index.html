@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space with Black Hole</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            background: radial-gradient(ellipse at bottom, #0d1117 0%, #000000 100%);
+            height: 100vh;
+            position: relative;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* ดาวพื้นหลัง */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* ดาวตก */
+        .shooting-star {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, #fff, transparent);
+            animation: shoot linear infinite;
+        }
+
+        @keyframes shoot {
+            0% {
+                transform: translateX(0) translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-500px) translateY(500px);
+                opacity: 0;
+            }
+        }
+
+        /* หลุมดำ - Black Hole (ย้ายไปมุมบนขวา) */
+        .black-hole-container {
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            width: 250px;
+            height: 250px;
+            z-index: 50;
+        }
+
+        .black-hole {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, 
+                transparent 0%, 
+                transparent 30%,
+                #000000 40%,
+                #000000 100%);
+            border-radius: 50%;
+            box-shadow: 
+                inset 0 0 50px #000,
+                inset 0 0 100px #000,
+                0 0 50px rgba(0, 0, 0, 0.8);
+            animation: rotate 20s linear infinite;
+        }
+
+        /* วงแหวนหลุมดำ - Accretion Disk */
+        .accretion-disk {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: conic-gradient(
+                transparent 0deg,
+                rgba(255, 100, 50, 0.6) 90deg,
+                rgba(255, 150, 100, 0.8) 180deg,
+                rgba(255, 200, 150, 0.6) 270deg,
+                transparent 360deg
+            );
+            animation: rotate 10s linear infinite;
+            filter: blur(3px);
+        }
+
+        .accretion-disk::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(
+                transparent 0deg,
+                rgba(100, 150, 255, 0.6) 90deg,
+                rgba(150, 200, 255, 0.8) 180deg,
+                rgba(200, 220, 255, 0.6) 270deg,
+                transparent 360deg
+            );
+            animation: rotate 15s linear infinite reverse;
+            filter: blur(2px);
+        }
+
+        .accretion-disk::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            box-shadow: 
+                0 0 60px rgba(255, 100, 50, 0.5),
+                0 0 100px rgba(100, 150, 255, 0.3),
+                inset 0 0 60px rgba(0, 0, 0, 0.8);
+        }
+
+        @keyframes rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* ดาวเคราะห์ต่างๆ */
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+            z-index: 40;
+        }
+
+        .planet1 {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle at 30% 30%, #ff6b6b, #c92a2a);
+            top: 15%;
+            left: 10%;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.6);
+            animation: float1 8s ease-in-out infinite;
+        }
+
+        .planet2 {
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle at 30% 30%, #4dabf7, #1971c2);
+            top: 60%;
+            right: 8%;
+            box-shadow: 0 0 40px rgba(77, 171, 247, 0.6);
+            animation: float2 10s ease-in-out infinite;
+        }
+
+        .planet3 {
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle at 30% 30%, #f59f00, #e67700);
+            bottom: 15%;
+            left: 15%;
+            box-shadow: 0 0 25px rgba(245, 159, 0, 0.6);
+            animation: float3 7s ease-in-out infinite;
+        }
+
+        .planet4 {
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle at 30% 30%, #51cf66, #2f9e44);
+            top: 40%;
+            left: 8%;
+            box-shadow: 0 0 35px rgba(81, 207, 102, 0.6);
+            animation: float4 9s ease-in-out infinite;
+        }
+
+        @keyframes float1 {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, -20px); }
+        }
+
+        @keyframes float2 {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-20px, 30px); }
+        }
+
+        @keyframes float3 {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(25px, 25px); }
+        }
+
+        @keyframes float4 {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-30px, -25px); }
+        }
+
+        /* เนบิวลา - Nebula */
+        .nebula {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            opacity: 0.3;
+            filter: blur(50px);
+            animation: pulse 8s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        .nebula1 {
+            background: radial-gradient(circle, #ff6b9d, transparent);
+            top: 5%;
+            left: 20%;
+        }
+
+        .nebula2 {
+            background: radial-gradient(circle, #4d96ff, transparent);
+            bottom: 10%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.2; }
+            50% { transform: scale(1.3); opacity: 0.4; }
+        }
+
+        /* วงกลมเรืองแสงตรงกลาง */
+        .circle-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+        }
+
+        .glowing-circle {
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            background: radial-gradient(circle, 
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0.08) 40%,
+                rgba(255, 255, 255, 0.03) 70%,
+                transparent 100%);
+            box-shadow: 
+                0 0 60px rgba(255, 255, 255, 0.3),
+                0 0 100px rgba(255, 255, 255, 0.2),
+                0 0 140px rgba(255, 255, 255, 0.1),
+                inset 0 0 60px rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: circle-glow 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        .glowing-circle::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            animation: rotate-border 20s linear infinite;
+        }
+
+        .glowing-circle::after {
+            content: '';
+            position: absolute;
+            width: 110%;
+            height: 110%;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: rotate-border 30s linear infinite reverse;
+        }
+
+        @keyframes circle-glow {
+            0%, 100% { 
+                box-shadow: 
+                    0 0 60px rgba(255, 255, 255, 0.3),
+                    0 0 100px rgba(255, 255, 255, 0.2),
+                    0 0 140px rgba(255, 255, 255, 0.1),
+                    inset 0 0 60px rgba(255, 255, 255, 0.1);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 80px rgba(255, 255, 255, 0.4),
+                    0 0 120px rgba(255, 255, 255, 0.3),
+                    0 0 160px rgba(255, 255, 255, 0.2),
+                    inset 0 0 80px rgba(255, 255, 255, 0.15);
+            }
+        }
+
+        @keyframes rotate-border {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* ข้อความภายในวงกลม */
+        .text-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .greeting {
+            font-size: 42px;
+            font-weight: normal;
+            color: #ffffff;
+            text-shadow: 
+                0 0 20px rgba(255, 255, 255, 0.8),
+                0 0 40px rgba(255, 255, 255, 0.4);
+            margin-bottom: 30px;
+            animation: text-glow 2s ease-in-out infinite;
+            letter-spacing: 2px;
+        }
+
+        .name {
+            font-size: 56px;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 
+                0 0 30px rgba(255, 255, 255, 0.9),
+                0 0 60px rgba(255, 255, 255, 0.5),
+                0 0 90px rgba(255, 255, 255, 0.3);
+            animation: text-glow 2s ease-in-out infinite 0.5s;
+            letter-spacing: 3px;
+        }
+
+        @keyframes text-glow {
+            0%, 100% { 
+                opacity: 0.9;
+            }
+            50% { 
+                opacity: 1;
+            }
+        }
+
+        /* จุดเรืองแสงรอบวงกลม */
+        .light-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            animation: particle-float linear infinite;
+        }
+
+        @keyframes particle-float {
+            0% {
+                transform: rotate(0deg) translateX(230px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: rotate(360deg) translateX(230px) rotate(-360deg);
+                opacity: 0;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- ดาวพื้นหลัง -->
+    <div class="stars" id="stars"></div>
+
+    <!-- เนบิวลา -->
+    <div class="nebula nebula1"></div>
+    <div class="nebula nebula2"></div>
+
+    <!-- ดาวเคราะห์ -->
+    <div class="planet planet1"></div>
+    <div class="planet planet2"></div>
+    <div class="planet planet3"></div>
+    <div class="planet planet4"></div>
+
+    <!-- หลุมดำ -->
+    <div class="black-hole-container">
+        <div class="accretion-disk"></div>
+        <div class="black-hole"></div>
+    </div>
+
+    <!-- วงกลมเรืองแสงพร้อมข้อความ -->
+    <div class="circle-container">
+        <div class="glowing-circle" id="glowingCircle">
+            <div class="text-content">
+                <div class="greeting">สวัสดีฉันคือ</div>
+                <div class="name">ไชยพร เล็กเจริญ</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // สร้างดาว
+        const starsContainer = document.getElementById('stars');
+        
+        // ดาวขนาดต่างๆ
+        for (let i = 0; i < 300; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            
+            // ขนาดสุ่ม
+            const size = Math.random() * 3;
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+            
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            
+            starsContainer.appendChild(star);
+        }
+
+        // สร้างดาวตก
+        for (let i = 0; i < 8; i++) {
+            const shootingStar = document.createElement('div');
+            shootingStar.className = 'shooting-star';
+            shootingStar.style.left = Math.random() * 100 + '%';
+            shootingStar.style.top = Math.random() * 50 + '%';
+            shootingStar.style.width = Math.random() * 150 + 100 + 'px';
+            shootingStar.style.animationDelay = Math.random() * 8 + 's';
+            shootingStar.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            starsContainer.appendChild(shootingStar);
+        }
+
+        // เพิ่มดาวเคราะห์เล็กๆ เพิ่มเติม
+        const colors = [
+            'radial-gradient(circle at 30% 30%, #fa5252, #c92a2a)',
+            'radial-gradient(circle at 30% 30%, #748ffc, #5c7cfa)',
+            'radial-gradient(circle at 30% 30%, #ffd43b, #fab005)',
+            'radial-gradient(circle at 30% 30%, #20c997, #12b886)',
+            'radial-gradient(circle at 30% 30%, #ff8787, #ff6b6b)',
+        ];
+
+        for (let i = 0; i < 10; i++) {
+            const smallPlanet = document.createElement('div');
+            smallPlanet.style.position = 'absolute';
+            smallPlanet.style.width = Math.random() * 20 + 15 + 'px';
+            smallPlanet.style.height = smallPlanet.style.width;
+            smallPlanet.style.borderRadius = '50%';
+            smallPlanet.style.background = colors[Math.floor(Math.random() * colors.length)];
+            smallPlanet.style.left = Math.random() * 100 + '%';
+            smallPlanet.style.top = Math.random() * 100 + '%';
+            smallPlanet.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.4)';
+            smallPlanet.style.zIndex = '40';
+            document.body.appendChild(smallPlanet);
+        }
+
+        // สร้างจุดแสงลอยรอบวงกลม
+        const glowingCircle = document.getElementById('glowingCircle');
+        for (let i = 0; i < 12; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'light-particle';
+            particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+            particle.style.animationDelay = (i * 1.5) + 's';
+            glowingCircle.appendChild(particle);
+        }
+    </script>
+</body>
+</html>
